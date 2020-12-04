@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MondayReporting2.Models;
+using MondayReporting2.Models.MyModels;
 
 namespace MondayReporting2.Controllers
 {
@@ -47,7 +48,7 @@ namespace MondayReporting2.Controllers
         // GET: CT_Users/Create
         public IActionResult Create()
         {
-            ViewData["RoleId"] = new SelectList(_context.CT_Roles, "id", "id");
+            ViewData["RoleId"] = new SelectList(_context.CT_Roles, "id", "Role");
             return View();
         }
 
@@ -58,8 +59,11 @@ namespace MondayReporting2.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("id,User,Password,LastAccess,Status,RoleId")] CT_Users cT_Users)
         {
+            Encrypt encrypto = new Encrypt();
+
             if (ModelState.IsValid)
             {
+                cT_Users.Password = encrypto.Encryptar(cT_Users.Password);
                 _context.Add(cT_Users);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
